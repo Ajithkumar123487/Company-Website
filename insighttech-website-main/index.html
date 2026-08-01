@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
+<title>InsightTech Solutions — Java Full Stack, Web &amp; Data Analytics Studio</title>
+<meta name="description" content="InsightTech Solutions builds websites, Java full stack applications, REST APIs and data analytics dashboards for growing businesses.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+  :root{
+    --navy:#0B1220;
+    --navy-2:#0F1A2E;
+    --sky:#0EA5E9;
+    --cyan:#22D3EE;
+    --line:#1E293B;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;background:var(--navy);color-scheme:dark;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--navy);
+    color:#CBD5E1;
+    margin:0;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.font-display{font-family:'Space Grotesk',sans-serif;}
+  .font-mono{font-family:'JetBrains Mono',monospace;}
+
+  .surface{background:var(--navy-2);border-color:var(--line);}
+  .surface-alt{background:#0D1526;}
+  .text-ink{color:#E2E8F0 !important;}
+  .text-muted{color:#94A3B8 !important;}
+  .border-line{border-color:var(--line) !important;}
+  nav{background:rgba(11,18,32,0.75);border-color:var(--line);}
+
+  /* node network background */
+  .node-net{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+  .node-net svg{width:100%;height:100%;}
+
+  .glass{
+    background:rgba(15,26,46,0.55);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border:1px solid rgba(30,41,59,0.8);
+  }
+
+  .card-hover{transition:transform .35s ease, box-shadow .35s ease, border-color .35s ease;}
+  .card-hover:hover{transform:translateY(-6px);box-shadow:0 20px 40px -20px rgba(14,165,233,0.35);border-color:var(--sky);}
+
+  .glow-dot{filter:drop-shadow(0 0 6px rgba(14,165,233,0.9));}
+
+  .reveal{opacity:0;transform:perspective(1200px) translateY(36px) rotateX(12deg);transform-origin:center bottom;transition:opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1);}
+  .reveal.in{opacity:1;transform:perspective(1200px) translateY(0) rotateX(0deg);}
+
+  /* ---- 3D interactive grid cards ---- */
+  .grid-3d{perspective:1400px;}
+  .tilt3d{
+    transform-style:preserve-3d;
+    transition:transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s ease, border-color .35s ease;
+    will-change:transform;
+  }
+  .tilt3d:hover{box-shadow:0 24px 45px -18px rgba(14,165,233,0.4);border-color:var(--sky);}
+  .tilt3d-inner{transform:translateZ(30px);transform-style:preserve-3d;}
+  .media-pop{transition:transform .4s ease;transform:translateZ(10px);}
+  .tilt3d:hover .media-pop{transform:translateZ(40px) scale(1.03);}
+
+  /* ---- flip cards (portfolio) ---- */
+  .flip-scene{perspective:1600px;}
+  .flip-card{position:relative;width:100%;height:100%;transition:transform .7s cubic-bezier(.2,.7,.2,1);transform-style:preserve-3d;}
+  .flip-scene:hover .flip-card, .flip-scene.flipped .flip-card{transform:rotateY(180deg);}
+  .flip-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+  .flip-back{transform:rotateY(180deg);}
+
+  .marquee-track{display:flex;width:max-content;animation:scroll-left 28s linear infinite;}
+  @keyframes scroll-left{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  .btn-primary{
+    background:linear-gradient(135deg,var(--sky),var(--cyan));
+    color:#fff;font-weight:600;
+    transition:transform .25s ease, box-shadow .25s ease;
+    box-shadow:0 8px 24px -8px rgba(14,165,233,0.6);
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 30px -10px rgba(14,165,233,0.75);}
+
+  .btn-ghost{
+    border:1.5px solid var(--line);
+    color:#E2E8F0;
+    font-weight:600;
+    transition:border-color .25s ease, color .25s ease;
+  }
+  .btn-ghost:hover{border-color:var(--sky);color:var(--sky);}
+
+  .accordion-content{max-height:0;overflow:hidden;transition:max-height .35s ease;}
+
+  /* native <select> dropdown list renders with a white background in most
+     browsers regardless of page theme — force dark text there so it's readable */
+  select{color:#E2E8F0;}
+  select option{color:#0F172A;background:#ffffff;}
+
+  /* ---- enquiry form kept on a white card for maximum readability ---- */
+  #enquiry-form{background:#ffffff;border-color:#E2E8F0 !important;color-scheme:light;}
+  #enquiry-form label{color:#334155 !important;}
+  #enquiry-form input,
+  #enquiry-form select,
+  #enquiry-form textarea{
+    background:#F8FAFC;
+    border-color:#CBD5E1 !important;
+    color:#0F172A !important;
+    caret-color:#0F172A;
+  }
+  #enquiry-form input::placeholder,
+  #enquiry-form textarea::placeholder{color:#94A3B8;}
+  #enquiry-form input:focus,
+  #enquiry-form select:focus,
+  #enquiry-form textarea:focus{border-color:var(--sky) !important;}
+  #enquiry-form select option{color:#0F172A;background:#ffffff;}
+  #enquiry-form .invalid{border-color:#EF4444 !important;}
+
+  .float-slow{animation:float 6s ease-in-out infinite;}
+  .float-slow-2{animation:float 7s ease-in-out infinite .8s;}
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-14px);}}
+
+  ::selection{background:var(--sky);color:#fff;}
+
+  .stat-num{font-variant-numeric:tabular-nums;}
+
+  #hero-canvas{cursor:grab;}
+  .tilt-card{transition:transform .15s ease-out;transform-style:preserve-3d;will-change:transform;}
+  #hero-3d-wrap{transform-style:preserve-3d;}
+
+  #whatsapp-fab{transition:transform .25s ease;}
+  #whatsapp-fab:hover{transform:scale(1.08) rotate(-4deg);}
+  #whatsapp-fab .wa-ring{position:absolute;inset:0;border-radius:9999px;background:#25D366;opacity:.55;animation:wa-pulse 2.2s ease-out infinite;}
+  @keyframes wa-pulse{0%{transform:scale(1);opacity:.55;}100%{transform:scale(1.9);opacity:0;}}
+  #whatsapp-tip{
+    position:absolute;right:70px;top:50%;transform:translateY(-50%) translateX(6px);
+    background:#111827;color:#fff;font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;
+    white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s ease;
+  }
+  #whatsapp-fab:hover #whatsapp-tip{opacity:1;transform:translateY(-50%) translateX(0);}
+</style>
+</head>
+<body class="text-ink">
+
+<!-- ============ NAV ============ -->
+<nav class="fixed top-0 w-full z-50 border-b border-line" style="background:rgba(11,18,32,0.75);backdrop-filter:blur(14px);">
+  <div class="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
+    <a href="#home" class="flex items-center gap-2">
+      <svg width="30" height="30" viewBox="0 0 100 100"><circle cx="50" cy="30" r="6" fill="#0EA5E9" class="glow-dot"/><circle cx="30" cy="55" r="6" fill="#0EA5E9" class="glow-dot"/><circle cx="70" cy="55" r="6" fill="#0EA5E9" class="glow-dot"/><line x1="50" y1="30" x2="30" y2="55" stroke="#22D3EE" stroke-width="2"/><line x1="50" y1="30" x2="70" y2="55" stroke="#22D3EE" stroke-width="2"/><line x1="30" y1="55" x2="70" y2="55" stroke="#22D3EE" stroke-width="2"/><path d="M42 60 L58 60 L52 82 L48 82 Z" fill="#0EA5E9"/></svg>
+      <span class="font-display font-bold text-lg text-ink">InsightTech<span style="color:var(--sky)">Solutions</span></span>
+    </a>
+    <div class="hidden lg:flex items-center gap-7 text-sm font-medium text-muted">
+      <a href="#about" class="hover:text-sky-500">About</a>
+      <a href="#services" class="hover:text-sky-500">Services</a>
+      <a href="#portfolio" class="hover:text-sky-500">Portfolio</a>
+      <a href="#technologies" class="hover:text-sky-500">Technologies</a>
+      <a href="#process" class="hover:text-sky-500">Process</a>
+      <a href="#faq" class="hover:text-sky-500">FAQ</a>
+      <a href="#contact" class="hover:text-sky-500">Contact</a>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="#contact" class="btn-primary hidden sm:inline-block px-5 py-2.5 rounded-full text-sm">Request For Project</a>
+      <button id="menu-toggle" class="lg:hidden w-9 h-9 flex items-center justify-center text-2xl text-ink">☰</button>
+    </div>
+  </div>
+  <div id="mobile-menu" class="hidden lg:hidden border-t border-line px-6 py-4 flex flex-col gap-4 text-sm font-medium text-ink">
+    <a href="#about">About</a><a href="#services">Services</a><a href="#portfolio">Portfolio</a>
+    <a href="#technologies">Technologies</a><a href="#process">Process</a><a href="#faq">FAQ</a><a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header id="home" class="relative pt-32 pb-24 overflow-hidden" style="background:var(--navy);">
+  <div class="node-net">
+    <svg viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice">
+      <g stroke="#1E3A5F" stroke-width="1">
+        <line x1="80" y1="120" x2="320" y2="260"/><line x1="320" y1="260" x2="180" y2="440"/>
+        <line x1="320" y1="260" x2="560" y2="180"/><line x1="560" y1="180" x2="780" y2="320"/>
+        <line x1="780" y1="320" x2="1020" y2="200"/><line x1="780" y1="320" x2="960" y2="500"/>
+        <line x1="180" y1="440" x2="420" y2="560"/><line x1="420" y1="560" x2="680" y2="500"/>
+        <line x1="1020" y1="200" x2="1140" y2="380"/>
+      </g>
+      <g fill="#0EA5E9">
+        <circle cx="80" cy="120" r="4"/><circle cx="320" cy="260" r="5"/><circle cx="180" cy="440" r="4"/>
+        <circle cx="560" cy="180" r="4"/><circle cx="780" cy="320" r="5"/><circle cx="1020" cy="200" r="4"/>
+        <circle cx="960" cy="500" r="4"/><circle cx="420" cy="560" r="4"/><circle cx="680" cy="500" r="4"/>
+        <circle cx="1140" cy="380" r="4"/>
+      </g>
+    </svg>
+  </div>
+  <div class="max-w-7xl mx-auto px-6 relative grid lg:grid-cols-2 gap-14 items-center">
+    <div class="reveal in">
+      <span class="font-mono text-xs tracking-widest uppercase px-3 py-1 rounded-full border border-sky-800 text-cyan-300" style="border-color:#1E3A5F;">Java Full Stack · Web · Data Analytics</span>
+      <h1 class="font-display text-4xl sm:text-5xl font-bold text-white mt-6 leading-tight">Transform your ideas into <span style="color:var(--sky)">digital reality</span></h1>
+      <p class="text-slate-400 mt-5 text-lg leading-relaxed max-w-xl">We build websites, e-commerce applications, business software, Java full stack applications, REST APIs, and data analytics dashboards that help businesses move faster.</p>
+      <div class="flex flex-wrap gap-4 mt-8">
+        <a href="#contact" class="btn-primary px-7 py-3.5 rounded-full">Get Free Quote</a>
+        <a href="#contact" class="btn-ghost px-7 py-3.5 rounded-full text-slate-200">Contact us</a>
+      </div>
+      <div class="grid grid-cols-4 gap-4 mt-14 max-w-lg">
+     <div><div class="stat-num inline-block font-display text-2xl font-bold text-white" data-count="100">0</div><span class="font-display text-2xl font-bold text-white">+</span><div class="text-xs text-slate-500 mt-1">Happy clients</div></div>
+<div><div class="stat-num inline-block font-display text-2xl font-bold text-white" data-count="120">0</div><span class="font-display text-2xl font-bold text-white">+</span><div class="text-xs text-slate-500 mt-1">Projects done</div></div>
+        <div><div class="stat-num font-display text-2xl font-bold text-white" data-count="99">0</div><div class="text-xs text-slate-500 mt-1">Satisfaction %</div></div>
+        <div><div class="font-display text-2xl font-bold text-white">24/7</div><div class="text-xs text-slate-500 mt-1">Support</div></div>
+      </div>
+    </div>
+    <div class="relative hidden lg:block h-[420px]" id="hero-3d-wrap" style="perspective:1000px;">
+      <canvas id="hero-canvas" class="absolute inset-0 w-full h-full"></canvas>
+      <div class="tilt-card absolute top-0 right-6 w-72 glass rounded-2xl p-4 float-slow" style="border-color:#1E3A5F;">
+        <div class="font-mono text-xs text-cyan-300 mb-2">EnquiryController.java</div>
+        <div class="font-mono text-xs text-slate-300 leading-6">
+          @PostMapping("/api/enquiry")<br>
+          public ResponseEntity&lt;?&gt; create(<br>
+          &nbsp;&nbsp;@Valid @RequestBody dto) {<br>
+          &nbsp;&nbsp;return service.save(dto);<br>
+          }
+        </div>
+      </div>
+      <div class="tilt-card absolute bottom-6 left-0 w-64 glass rounded-2xl p-4 float-slow-2" style="border-color:#1E3A5F;">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs text-slate-300 font-medium">Weekly leads</span>
+          <span class="text-xs text-cyan-300">▲ 18%</span>
+        </div>
+        <svg viewBox="0 0 200 60" class="w-full h-14">
+          <polyline points="0,45 30,38 60,42 90,25 120,30 150,12 180,18 200,6" fill="none" stroke="#22D3EE" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="tilt-card absolute top-32 left-16 glass rounded-full px-4 py-2 flex items-center gap-2 text-xs text-slate-200 float-slow">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Build passing
+      </div>
+      <div class="tilt-card absolute bottom-32 right-4 glass rounded-full px-4 py-2 text-xs text-slate-200 font-mono float-slow-2">Spring Boot · React · MySQL</div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ ABOUT ============ -->
+<section id="about" class="py-24 border-b border-line">
+  <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
+    <div class="reveal">
+      <span class="font-mono text-xs tracking-widest uppercase text-sky-500">About us</span>
+      <h2 class="font-display text-3xl font-bold mt-3">Engineers first, salespeople never</h2>
+      <p class="text-muted mt-5 leading-relaxed">InsightTech Solutions is a Bangalore-based development studio building Java full stack applications, business websites and data analytics tooling for founders and small businesses who need software that actually ships. We write clean, testable code and stay involved after launch.</p>
+      <div class="grid sm:grid-cols-2 gap-4 mt-8">
+        <div class="flex items-start gap-3"><span class="text-sky-500 mt-1">◆</span><span class="text-sm">Clean architecture, not quick hacks</span></div>
+        <div class="flex items-start gap-3"><span class="text-sky-500 mt-1">◆</span><span class="text-sm">Transparent, affordable pricing</span></div>
+        <div class="flex items-start gap-3"><span class="text-sky-500 mt-1">◆</span><span class="text-sm">Modern stack: Spring Boot + React</span></div>
+        <div class="flex items-start gap-3"><span class="text-sky-500 mt-1">◆</span><span class="text-sm">Support after go-live, not before</span></div>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-5">
+     <div class="surface border border-line rounded-2xl p-6"><div class="stat-num inline-block font-display text-3xl font-bold text-sky-500" data-count="120">0</div><span class="font-display text-3xl font-bold text-sky-500">+</span><div class="text-sm text-muted mt-1">Projects</div></div>
+<div class="surface border border-line rounded-2xl p-6 mt-8"><div class="stat-num inline-block font-display text-3xl font-bold text-sky-500" data-count="100">0</div><span class="font-display text-3xl font-bold text-sky-500">+</span><div class="text-sm text-muted mt-1">Clients</div></div>
+<div class="surface border border-line rounded-2xl p-6"><div class="stat-num inline-block font-display text-3xl font-bold text-sky-500" data-count="1.5">0</div><span class="font-display text-3xl font-bold text-sky-500">+</span><div class="text-sm text-muted mt-1">Years experience</div></div>
+      <div class="surface border border-line rounded-2xl p-6 mt-8"><div class="font-display text-3xl font-bold text-sky-500">24/7</div><div class="text-sm text-muted mt-1">Support</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SERVICES ============ -->
+<section id="services" class="py-24 border-b border-line surface-alt">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center max-w-2xl mx-auto reveal">
+      <span class="font-mono text-xs tracking-widest uppercase text-sky-500">What we build</span>
+      <h2 class="font-display text-3xl font-bold mt-3">Services</h2>
+    </div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-14 grid-3d" id="services-grid">
+      <!-- injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ============ TECHNOLOGIES ============ -->
+<section id="technologies" class="py-20 border-b border-line overflow-hidden">
+  <div class="max-w-7xl mx-auto px-6 text-center reveal">
+    <span class="font-mono text-xs tracking-widest uppercase text-sky-500">Stack</span>
+    <h2 class="font-display text-3xl font-bold mt-3">Technologies we work with</h2>
+  </div>
+  <div class="mt-12 overflow-hidden">
+    <div class="marquee-track" id="tech-track"></div>
+  </div>
+</section>
+
+<!-- ============ WHY CHOOSE US ============ -->
+<section class="py-24 border-b border-line surface-alt">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center max-w-2xl mx-auto reveal">
+      <span class="font-mono text-xs tracking-widest uppercase text-sky-500">Why us</span>
+      <h2 class="font-display text-3xl font-bold mt-3">Why choose InsightTech Solutions</h2>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-14" id="why-grid"></div>
+  </div>
+</section>
+
+<!-- ============ PROCESS ============ -->
+<section id="process" class="py-24 border-b border-line">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center max-w-2xl mx-auto reveal">
+      <span class="font-mono text-xs tracking-widest uppercase text-sky-500">How we work</span>
+      <h2 class="font-display text-3xl font-bold mt-3">Development process</h2>
+    </div>
+    <div class="relative mt-16" id="process-track"></div>
+  </div>
+</section>
+
+<!-- ============ PORTFOLIO ============ -->
+<section id="portfolio" class="py-24 border-b border-line surface-alt">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center max-w-2xl mx-auto reveal">
+      <span class="font-mono text-xs tracking-widest uppercase text-sky-500">Recent work</span>
+      <h2 class="font-display text-3xl font-bold mt-3">Portfolio</h2>
+    </div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-14 grid-3d" id="portfolio-grid"></div>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIALS ============ -->
+<section class="py-24 border-b border-line" style="background:var(--navy);">
+  <div class="max-w-4xl mx-auto px-6 text-center">
+    <span class="font-mono text-xs tracking-widest uppercase text-sky-400">Client feedback</span>
+    <h2 class="font-display text-3xl font-bold mt-3 text-white">Testimonials</h2>
+    <div class="mt-12 relative min-h-[220px]" id="testimonial-box"></div>
+    <div class="flex justify-center gap-2 mt-6" id="testimonial-dots"></div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section id="faq" class="py-24 border-b border-line">
+  <div class="max-w-3xl mx-auto px-6">
+    <div class="text-center reveal">
+      <span class="font-mono text-xs tracking-widest uppercase text-sky-500">Questions</span>
+      <h2 class="font-display text-3xl font-bold mt-3">Frequently asked questions</h2>
+    </div>
+    <div class="mt-12 space-y-3" id="faq-list"></div>
+  </div>
+</section>
+
+<!-- ============ CONTACT / ENQUIRY FORM ============ -->
+<section id="contact" class="py-24 surface-alt">
+  <div class="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-14">
+    <div class="reveal">
+      <span class="font-mono text-xs tracking-widest uppercase text-sky-500">Get in touch</span>
+      <h2 class="font-display text-3xl font-bold mt-3">Tell us about your project</h2>
+      <p class="text-muted mt-4 leading-relaxed">Fill the form and our team will get back to you within 24 hours. Prefer to talk directly? Reach us below.</p>
+      <div class="mt-8 space-y-4 text-sm">
+        <div class="flex items-center gap-3"><span class="w-9 h-9 rounded-full surface border border-line flex items-center justify-center">✉</span> insighttechsolution06@gmail.com</div>
+        <div class="flex items-center gap-3"><span class="w-9 h-9 rounded-full surface border border-line flex items-center justify-center">☎</span> +91 87788 78069</div>
+        <div class="flex items-center gap-3"><span class="w-9 h-9 rounded-full surface border border-line flex items-center justify-center">📍</span> Electronic City, Bengaluru, Karnataka</div>
+      </div>
+    </div>
+    <form id="enquiry-form" class="surface border border-line rounded-2xl p-7 space-y-4" novalidate>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label class="text-xs font-medium text-muted">Full name *</label>
+          <input name="name" id="field-name" class="mt-1 w-full rounded-lg border border-line bg-transparent px-3 py-2.5 text-sm outline-none focus:border-sky-500">
+          <p class="field-error hidden text-xs text-red-500 mt-1"></p>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-muted">Email *</label>
+          <input type="email" name="email" id="field-email" class="mt-1 w-full rounded-lg border border-line bg-transparent px-3 py-2.5 text-sm outline-none focus:border-sky-500">
+          <p class="field-error hidden text-xs text-red-500 mt-1"></p>
+        </div>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label class="text-xs font-medium text-muted">Phone *</label>
+          <input name="phone" id="field-phone" class="mt-1 w-full rounded-lg border border-line bg-transparent px-3 py-2.5 text-sm outline-none focus:border-sky-500">
+          <p class="field-error hidden text-xs text-red-500 mt-1"></p>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-muted">Project category *</label>
+          <select name="category" id="field-category" class="mt-1 w-full rounded-lg border border-line bg-transparent px-3 py-2.5 text-sm outline-none focus:border-sky-500">
+            <option value="">Select…</option>
+            <option>Website Development</option><option>Java Full Stack</option><option>MERN Stack</option><option>AI&ML Project</option><option>Poster & Adds</option><option>Photo & Video Editz</option><option>Social Meadia Management</option>
+            <option>E-Commerce</option><option>Data Analytics / Power BI</option><option>Custom Software</option><option>Other</option>
+          </select>
+          <p class="field-error hidden text-xs text-red-500 mt-1"></p>
+        </div>
+      </div>
+      <div>
+        <label class="text-xs font-medium text-muted">Project title *</label>
+        <input name="title" id="field-title" class="mt-1 w-full rounded-lg border border-line bg-transparent px-3 py-2.5 text-sm outline-none focus:border-sky-500">
+        <p class="field-error hidden text-xs text-red-500 mt-1"></p>
+      </div>
+      <div>
+        <label class="text-xs font-medium text-muted">Project description *</label>
+        <textarea rows="4" name="description" id="field-description" class="mt-1 w-full rounded-lg border border-line bg-transparent px-3 py-2.5 text-sm outline-none focus:border-sky-500"></textarea>
+        <p class="field-error hidden text-xs text-red-500 mt-1"></p>
+      </div>
+      <button type="submit" class="btn-primary w-full py-3 rounded-lg">Submit requirement</button>
+      <p id="form-status" class="text-xs text-center hidden"></p>
+    </form>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer style="background:var(--navy);" class="text-slate-400 pt-16 pb-8">
+  <div class="max-w-7xl mx-auto px-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
+    <div>
+      <div class="flex items-center gap-2">
+        <svg width="26" height="26" viewBox="0 0 100 100"><circle cx="50" cy="30" r="6" fill="#0EA5E9"/><circle cx="30" cy="55" r="6" fill="#0EA5E9"/><circle cx="70" cy="55" r="6" fill="#0EA5E9"/><line x1="50" y1="30" x2="30" y2="55" stroke="#22D3EE" stroke-width="2"/><line x1="50" y1="30" x2="70" y2="55" stroke="#22D3EE" stroke-width="2"/><line x1="30" y1="55" x2="70" y2="55" stroke="#22D3EE" stroke-width="2"/></svg>
+        <span class="font-display font-bold text-white">InsightTech Solutions</span>
+      </div>
+      <p class="text-sm mt-4 leading-relaxed">Java full stack, web and data analytics engineering for growing businesses.</p>
+    </div>
+    <div>
+      <div class="text-white text-sm font-semibold mb-4">Quick links</div>
+      <div class="flex flex-col gap-2 text-sm"><a href="#about">About</a><a href="#services">Services</a><a href="#portfolio">Portfolio</a><a href="#contact">Contact</a></div>
+    </div>
+    <div>
+      <div class="text-white text-sm font-semibold mb-4">Services</div>
+      <div class="flex flex-col gap-2 text-sm"><span>Web development</span><span>Java full stack</span><span>Data analytics</span><span>Cloud hosting</span></div>
+    </div>
+    <div>
+      <div class="text-white text-sm font-semibold mb-4">Stay updated</div>
+      <div class="flex flex-col sm:flex-row gap-2">
+        <input placeholder="Your email" class="w-full sm:flex-1 sm:min-w-0 rounded-lg bg-slate-800 border border-slate-700 px-3 py-2 text-sm text-white outline-none">
+        <button class="btn-primary px-4 py-2 rounded-lg text-sm whitespace-nowrap">Join</button>
+      </div>
+    </div>
+  </div>
+  <div class="max-w-7xl mx-auto px-6 mt-12 pt-6 border-t border-slate-800 flex flex-col sm:flex-row justify-between gap-3 text-xs">
+    <span>© 2026 InsightTech Solutions. All rights reserved.</span>
+    <div class="flex gap-5"><a href="#">Privacy policy</a><a href="#">Terms</a></div>
+  </div>
+</footer>
+
+<a id="whatsapp-fab" href="https://wa.me/+918778878069" target="_blank" aria-label="Chat with us on WhatsApp" class="fixed bottom-6 right-6 z-40 w-16 h-16 rounded-full shadow-lg">
+  <span class="wa-ring"></span>
+  <span id="whatsapp-tip">Chat with us</span>
+  <img src="whatsapp.png" alt="WhatsApp" class="relative w-16 h-16 rounded-full shadow-lg" />
+</a>
+<button id="scroll-top" class="fixed bottom-6 left-6 z-40 w-11 h-11 rounded-full btn-primary hidden items-center justify-center">↑</button>
+
+<script>
+/* ---------- data ---------- */
+const services = [
+  {t:"Website Development", d:"Business, portfolio and landing page websites, fully responsive.",
+   art:`<img src="website.png" alt="Website development" class="w-full h-full object-cover" loading="lazy">`},
+  {t:"Java Full Stack", d:"Spring Boot, REST APIs, React and MySQL applications.",
+   art:`<img src="java.jpg" alt="Java full stack development" class="w-full h-full object-cover" loading="lazy">`},
+  {t:"E-Commerce", d:"Storefronts with payment gateway and inventory management.",
+   art:`<img src="ecommerce.jpg" alt="E-commerce development" class="w-full h-full object-cover" loading="lazy">`},
+  {t:"College Projects", d:"practical projects for final-year engineering students.Delivered with quality,innovation,and complete project support..",
+   art:`<img src="software.jpg" alt="Custom software development" class="w-full h-full object-cover" loading="lazy">`},
+  {t:"Data Analytics", d:"Power BI dashboards, SQL reporting and business intelligence.",
+   art:`<img src="data.jpg" alt="Data analytics dashboard" class="w-full h-full object-cover" loading="lazy">`},
+  {t:"Hosting & Cloud", d:"AWS deployment, SSL, domains and ongoing maintenance.",
+   art:`<img src="hosting.jpg" alt="Hosting and cloud solutions" class="w-full h-full object-cover" loading="lazy">`},
+];
+const techs = ["React","Spring Boot","Java","MySQL","Tailwind CSS","Hibernate","Docker","AWS","Git","Power BI","Python","Postman","Maven","Spring Security","JavaScript","Figma"];
+const why = [
+  {t:"Experienced approach", d:"Modern patterns from day one, not legacy shortcuts."},
+  {t:"Affordable pricing", d:"Transparent quotes with no hidden costs."},
+  {t:"Secure by default", d:"JWT, BCrypt and input validation on every build."},
+  {t:"Fast delivery", d:"Clear milestones so you always know what's next."},
+];
+const process = ["Requirement discussion","Planning","Wireframe & UI design","Development","Testing","Deployment","Maintenance"];
+const portfolio = [
+  {t:"Restaurant ordering site", s:"React · Spring Boot · MySQL",
+   d:"Digital menu, cart and live order tracking for a dine-in and takeaway restaurant.",
+   art:`<img src="restaurant.jpg" alt="Restaurant ordering site" class="w-full h-full object-cover" loading="lazy">`},
+  {t:"Photo studio website", s:"React · Tailwind CSS",
+   d:"Bold, image-first portfolio site for a freelance photographer with a project gallery and booking call-to-action.",
+   art:`<img src="photostudio.webp" alt="Photo studio website" class="w-full h-full object-cover" loading="lazy">`},
+  {t:"Travel agency website", s:"React · Tailwind CSS",
+   d:"Flight, hotel and holiday package booking site with a destination search widget and tour listings.",
+   art:`<img src="travel-agency.jpg" alt="Travel agency website" class="w-full h-full object-cover" loading="lazy">`},
+  {t:"Interior design website", s:"React · Tailwind CSS",
+   d:"Elegant portfolio site for an interior design studio, showcasing projects, room concepts and client enquiries.",
+   art:`<img src="interior-design.jpg" alt="Interior design website" class="w-full h-full object-cover" loading="lazy">`},
+  {t:"Business portfolio website", s:"React · Tailwind",
+   d:"Fast, SEO-friendly marketing site with case studies and a lead capture form.",
+   art:`<img src="business.jpg" alt="Business portfolio website" class="w-full h-full object-cover" loading="lazy">`},
+  {t:"Ads & Video editing", s:"Canva · Premiere Pro · After Effects",
+   d:"Social media ad creatives and edited promo videos for brand and product campaigns.",
+   art:`<img src="ads_video.jpg" alt="Ad campaign and video editing project" class="w-full h-full object-cover" loading="lazy">`},
+];
+const testimonials = [
+  {n:"DHANUSH R", c:"Founder, Customer Support.", q:"They delivered our inventory system ahead of schedule and it still runs without issues months later."},
+  {n:"AJITHKUMAR E", c:"Java FullStack Developer, Backend", q:"Clear communication throughout, and the dashboard they built genuinely changed how we track patients."},
+  {n:"MANIVANNAN", c:"Founder, Manager", q:"Affordable, professional, and the finished site loads noticeably faster than what we had before."},
+];
+const faqs = [
+  {q:"How much does a website cost?", a:"Pricing depends on scope — a landing page starts modestly, while full Java full stack applications with a database and admin panel are quoted after a short requirement call."},
+  {q:"How long does development take?", a:"Simple websites: 1-2 weeks. Full stack applications with authentication and a database: 3-6 weeks depending on features."},
+  {q:"Do I get the source code?", a:"Yes, full source code ownership transfers to you on final payment."},
+  {q:"Is hosting included?", a:"We can set up hosting, domain and SSL for you, or hand over deployment-ready code for your own infrastructure."},
+  {q:"What happens after launch?", a:"We offer maintenance packages, but you're never locked in — the codebase is yours to maintain independently too."},
+];
+
+/* ---------- render ---------- */
+document.getElementById('services-grid').innerHTML = services.map(s=>`
+  <div class="tilt3d surface border border-line rounded-2xl overflow-hidden">
+    <div class="h-36 media-pop" style="background:#EEF2F7;">${s.art}</div>
+    <div class="p-6">
+      <h3 class="font-display font-semibold">${s.t}</h3>
+      <p class="text-sm text-muted mt-2 leading-relaxed">${s.d}</p>
+    </div>
+  </div>`).join('');
+
+document.getElementById('tech-track').innerHTML = [...techs,...techs].map(t=>`
+  <span class="font-mono text-sm px-5 py-2.5 mx-2 rounded-full border border-line surface whitespace-nowrap">${t}</span>`).join('');
+
+document.getElementById('why-grid').innerHTML = why.map(w=>`
+  <div class="surface border border-line rounded-2xl p-6">
+    <div class="w-9 h-9 rounded-full bg-sky-500/10 text-sky-500 flex items-center justify-center font-bold">✓</div>
+    <h3 class="font-display font-semibold mt-4 text-sm">${w.t}</h3>
+    <p class="text-xs text-muted mt-2 leading-relaxed">${w.d}</p>
+  </div>`).join('');
+
+document.getElementById('process-track').innerHTML = `
+  <div class="grid sm:grid-cols-4 lg:grid-cols-7 gap-4">
+  ${process.map((p,i)=>`
+    <div class="text-center">
+      <div class="w-10 h-10 mx-auto rounded-full btn-primary flex items-center justify-center font-mono text-sm">${i+1}</div>
+      <div class="text-xs mt-3 font-medium">${p}</div>
+    </div>`).join('')}
+  </div>`;
+
+document.getElementById('portfolio-grid').innerHTML = portfolio.map(p=>`
+  <div class="flip-scene tilt3d h-72 rounded-2xl">
+    <div class="flip-card">
+      <div class="flip-face rounded-2xl overflow-hidden surface border border-line flex flex-col">
+        <div class="h-40 overflow-hidden" style="background:#EEF2F7;">${p.art}</div>
+        <div class="p-5">
+          <h3 class="font-display font-semibold text-sm">${p.t}</h3>
+          <p class="font-mono text-xs text-sky-500 mt-2">${p.s}</p>
+        </div>
+      </div>
+      <div class="flip-face flip-back rounded-2xl overflow-hidden border border-line flex flex-col justify-between p-6" style="background:linear-gradient(135deg,#0B1220,#0F1A2E);">
+        <div>
+          <h3 class="font-display font-semibold text-white">${p.t}</h3>
+          <p class="text-sm text-slate-400 mt-3 leading-relaxed">${p.d}</p>
+        </div>
+        <p class="font-mono text-xs text-cyan-300">${p.s}</p>
+      </div>
+    </div>
+  </div>`).join('');
+
+document.getElementById('faq-list').innerHTML = faqs.map((f,i)=>`
+  <div class="surface border border-line rounded-xl overflow-hidden">
+    <button class="faq-toggle w-full text-left px-5 py-4 flex justify-between items-center font-medium text-sm" data-i="${i}">
+      ${f.q}<span class="faq-icon text-sky-500">+</span>
+    </button>
+    <div class="accordion-content px-5 text-sm text-muted" id="faq-content-${i}"><p class="pb-4">${f.a}</p></div>
+  </div>`).join('');
+
+document.querySelectorAll('.faq-toggle').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const i = btn.dataset.i;
+    const content = document.getElementById(`faq-content-${i}`);
+    const icon = btn.querySelector('.faq-icon');
+    const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
+    document.querySelectorAll('.accordion-content').forEach(c=>c.style.maxHeight=null);
+    document.querySelectorAll('.faq-icon').forEach(ic=>ic.textContent='+');
+    if(!isOpen){ content.style.maxHeight = content.scrollHeight+'px'; icon.textContent='−'; }
+  });
+});
+
+/* ---------- 3D tilt interaction for service & portfolio cards ---------- */
+function attachTilt3D(selector){
+  document.querySelectorAll(selector).forEach(card=>{
+    card.addEventListener('mousemove', (e)=>{
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - 0.5;
+      const py = (e.clientY - r.top) / r.height - 0.5;
+      const rx = (-py * 12).toFixed(2);
+      const ry = (px * 14).toFixed(2);
+      card.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-4px)`;
+    });
+    card.addEventListener('mouseleave', ()=>{ card.style.transform = ''; });
+  });
+}
+attachTilt3D('#services-grid .tilt3d');
+attachTilt3D('#portfolio-grid .tilt3d');
+
+/* tap-to-flip fallback for touch devices */
+document.querySelectorAll('#portfolio-grid .flip-scene').forEach(scene=>{
+  scene.addEventListener('click', ()=>{
+    if (window.matchMedia('(hover: none)').matches){
+      scene.classList.toggle('flipped');
+    }
+  });
+});
+
+/* testimonials */
+let tIndex = 0;
+const tBox = document.getElementById('testimonial-box');
+const tDots = document.getElementById('testimonial-dots');
+function renderTestimonial(){
+  const t = testimonials[tIndex];
+  tBox.innerHTML = `<p class="text-slate-200 text-lg leading-relaxed max-w-2xl mx-auto">"${t.q}"</p>
+  <div class="mt-6 text-sky-400 font-medium text-sm">${t.n}</div>
+  <div class="text-slate-500 text-xs">${t.c}</div>`;
+  tDots.innerHTML = testimonials.map((_,i)=>`<span class="w-2 h-2 rounded-full ${i===tIndex?'bg-sky-400':'bg-slate-700'}"></span>`).join('');
+}
+renderTestimonial();
+setInterval(()=>{ tIndex=(tIndex+1)%testimonials.length; renderTestimonial(); }, 5000);
+
+/* counters */
+const counters = document.querySelectorAll('[data-count]');
+const counterObserver = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const el = e.target; const target = +el.dataset.count; let cur = 0;
+      const step = Math.max(1, Math.ceil(target/40));
+      const timer = setInterval(()=>{ cur+=step; if(cur>=target){cur=target; clearInterval(timer);} el.textContent=cur; }, 30);
+      counterObserver.unobserve(el);
+    }
+  });
+}, {threshold:0.4});
+counters.forEach(c=>counterObserver.observe(c));
+
+/* reveal on scroll */
+const revealEls = document.querySelectorAll('.reveal');
+const revealObserver = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); revealObserver.unobserve(e.target);} });
+},{threshold:0.15});
+revealEls.forEach(el=>revealObserver.observe(el));
+
+/* mobile menu */
+document.getElementById('menu-toggle').addEventListener('click', ()=>{
+  document.getElementById('mobile-menu').classList.toggle('hidden');
+});
+
+/* scroll top */
+const scrollTopBtn = document.getElementById('scroll-top');
+window.addEventListener('scroll', ()=>{
+  if(window.scrollY>500){ scrollTopBtn.classList.remove('hidden'); scrollTopBtn.classList.add('flex'); }
+  else{ scrollTopBtn.classList.add('hidden'); scrollTopBtn.classList.remove('flex'); }
+});
+scrollTopBtn.addEventListener('click', ()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+/* ---------- interactive 3D hero scene (Three.js) ---------- */
+(function initHero3D(){
+  const wrap = document.getElementById('hero-3d-wrap');
+  const canvas = document.getElementById('hero-canvas');
+  if (!wrap || !canvas || typeof THREE === 'undefined') return;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, wrap.clientWidth / wrap.clientHeight, 0.1, 100);
+  camera.position.z = 5;
+
+  function sizeRenderer(){
+    const w = wrap.clientWidth, h = wrap.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  sizeRenderer();
+  window.addEventListener('resize', sizeRenderer);
+
+  const group = new THREE.Group();
+  scene.add(group);
+
+  const geo = new THREE.IcosahedronGeometry(1.7, 1);
+  const wireMat = new THREE.MeshBasicMaterial({ color: 0x0ea5e9, wireframe: true, transparent: true, opacity: 0.55 });
+  const wireMesh = new THREE.Mesh(geo, wireMat);
+  group.add(wireMesh);
+
+  const pointsMat = new THREE.PointsMaterial({ color: 0x22d3ee, size: 0.06, sizeAttenuation: true });
+  const points = new THREE.Points(geo, pointsMat);
+  group.add(points);
+
+  const innerGeo = new THREE.IcosahedronGeometry(0.5, 0);
+  const innerMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.8 });
+  const innerMesh = new THREE.Mesh(innerGeo, innerMat);
+  group.add(innerMesh);
+
+  let mouseX = 0, mouseY = 0, targetRotX = 0, targetRotY = 0;
+  wrap.addEventListener('mousemove', (e)=>{
+    const rect = wrap.getBoundingClientRect();
+    mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouseY = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+    targetRotY = mouseX * 0.6;
+    targetRotX = mouseY * 0.4;
+
+    wrap.querySelectorAll('.tilt-card').forEach((card)=>{
+      const rx = (-mouseY * 6).toFixed(2);
+      const ry = (mouseX * 8).toFixed(2);
+      card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+    });
+  });
+  wrap.addEventListener('mouseleave', ()=>{
+    targetRotX = 0; targetRotY = 0;
+    wrap.querySelectorAll('.tilt-card').forEach((card)=>{ card.style.transform = 'rotateX(0deg) rotateY(0deg)'; });
+  });
+
+  function animate(){
+    requestAnimationFrame(animate);
+    group.rotation.y += 0.0035;
+    group.rotation.x += (targetRotX - group.rotation.x) * 0.04;
+    group.rotation.y += (targetRotY * 0.3);
+    innerMesh.rotation.y -= 0.01;
+    innerMesh.rotation.x += 0.006;
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+
+/* ---------- EmailJS setup ----------
+   1. Create a free account at https://www.emailjs.com
+   2. Add an Email Service (e.g. Gmail) — copy its Service ID.
+   3. Create an Email Template with variables: {{from_name}}, {{from_email}},
+      {{phone}}, {{category}}, {{title}}, {{message}} — copy the Template ID.
+   4. Get your Public Key from Account > General.
+   5. Replace the three placeholder strings below with your real values. */
+const EMAILJS_PUBLIC_KEY  = "q4UFV3oBWP4f-VB1r";
+const EMAILJS_SERVICE_ID  = "service_hno78xx";
+const EMAILJS_TEMPLATE_ID = "template_lat5c1q";
+
+if (window.emailjs) { emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY }); }
+
+/* ---------- validation ---------- */
+function showFieldError(input, message){
+  input.classList.add('invalid');
+  const err = input.parentElement.querySelector('.field-error');
+  if (err){ err.textContent = message; err.classList.remove('hidden'); }
+}
+function clearFieldError(input){
+  input.classList.remove('invalid');
+  const err = input.parentElement.querySelector('.field-error');
+  if (err){ err.textContent = ''; err.classList.add('hidden'); }
+}
+function validateEnquiryForm(form){
+  let isValid = true;
+  const name = form.querySelector('#field-name');
+  const email = form.querySelector('#field-email');
+  const phone = form.querySelector('#field-phone');
+  const category = form.querySelector('#field-category');
+  const title = form.querySelector('#field-title');
+  const description = form.querySelector('#field-description');
+  [name, email, phone, category, title, description].forEach(clearFieldError);
+
+  if (name.value.trim().length < 2){
+    showFieldError(name, 'Please enter your full name (at least 2 characters).'); isValid = false;
+  }
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(email.value.trim())){
+    showFieldError(email, 'Please enter a valid email address.'); isValid = false;
+  }
+  const phonePattern = /^[0-9]{10}$/;
+  if (!phonePattern.test(phone.value.trim().replace(/[\s-]/g,''))){
+    showFieldError(phone, 'Please enter a valid 10-digit phone number.'); isValid = false;
+  }
+  if (!category.value){
+    showFieldError(category, 'Please select a project category.'); isValid = false;
+  }
+  if (title.value.trim().length < 3){
+    showFieldError(title, 'Please enter a project title.'); isValid = false;
+  }
+  if (description.value.trim().length < 10){
+    showFieldError(description, 'Please describe your project in at least 10 characters.'); isValid = false;
+  }
+  return isValid;
+}
+/* clear individual field errors as the user fixes them */
+['field-name','field-email','field-phone','field-category','field-title','field-description'].forEach(function(id){
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', function(){ clearFieldError(el); });
+});
+
+document.getElementById('enquiry-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  const form = this;
+  const status = document.getElementById('form-status');
+  status.classList.add('hidden');
+
+  if (!validateEnquiryForm(form)){
+    status.textContent = 'Please fix the highlighted fields and try again.';
+    status.className = 'text-xs text-center text-red-500 mt-2';
+    status.classList.remove('hidden');
+    return;
+  }
+
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const original = submitBtn.textContent;
+  submitBtn.textContent = 'Submitting…';
+  submitBtn.disabled = true;
+
+  const templateParams = {
+    from_name: form.name.value.trim(),
+    from_email: form.email.value.trim(),
+    phone: form.phone.value.trim(),
+    category: form.category.value,
+    title: form.title.value.trim(),
+    message: form.description.value.trim()
+  };
+
+  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+    .then(function(){
+      status.textContent = 'Thanks — your requirement has been received. We will reach out within 24 hours.';
+      status.className = 'text-xs text-center text-emerald-500 mt-2';
+      status.classList.remove('hidden');
+      form.reset();
+    })
+    .catch(function(err){
+      console.error('EmailJS error:', err);
+      status.textContent = 'Something went wrong sending your message. Please try again or email us directly.';
+      status.className = 'text-xs text-center text-red-500 mt-2';
+      status.classList.remove('hidden');
+    })
+    .finally(function(){
+      submitBtn.textContent = original;
+      submitBtn.disabled = false;
+    });
+});
+</script>
+</body>
+</html>
